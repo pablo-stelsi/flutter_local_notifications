@@ -22,8 +22,8 @@ int id = 0;
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-/// Streams are created so that app can respond to notification-related events
-/// since the plugin is initialised in the `main` function
+/// 앱이 알림 관련 이벤트에 응답할 수 있도록 스트림이 생성됩니다.
+/// 플러그인은 'main' 함수에서 초기화되므로
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
 
@@ -51,16 +51,16 @@ class ReceivedNotification {
 
 String? selectedNotificationPayload;
 
-/// A notification action which triggers a url launch event
+/// URL 실행 이벤트를 트리거하는 알림 액션
 const String urlLaunchActionId = 'id_1';
 
-/// A notification action which triggers a App navigation event
+/// 앱 탐색 이벤트를 트리거하는 알림 액션
 const String navigationActionId = 'id_3';
 
-/// Defines a iOS/MacOS notification category for text input actions.
+/// 텍스트 입력 동작에 대한 iOS/MacOS 알림 카테고리를 정의합니다.
 const String darwinNotificationCategoryText = 'textCategory';
 
-/// Defines a iOS/MacOS notification category for plain actions.
+/// 일반 작업에 대한 iOS/MacOS 알림 카테고리를 정의합니다.
 const String darwinNotificationCategoryPlain = 'plainCategory';
 
 @pragma('vm:entry-point')
@@ -71,18 +71,17 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
       ' payload: ${notificationResponse.payload}');
   if (notificationResponse.input?.isNotEmpty ?? false) {
     // ignore: avoid_print
-    print(
-        'notification action tapped with input: ${notificationResponse.input}');
+    print('입력으로 탭한 알림 동작: ${notificationResponse.input}');
   }
 }
 
-/// IMPORTANT: running the following code on its own won't work as there is
-/// setup required for each platform head project.
+/// 중요: 다음 코드를 단독으로 실행하면 작동하지 않습니다.
+/// 각 플랫폼 헤드 프로젝트에 필요한 설정이 필요합니다.
 ///
-/// Please download the complete example app from the GitHub repository where
-/// all the setup has been done
+/// 전체 예제 앱은 GitHub 리포지토리에서 다운로드하세요.
+/// 모든 설정이 완료되었습니다.
 Future<void> main() async {
-  // needed if you intend to initialize in the `main` function
+  // `메인` 함수에서 초기화하려는 경우 필요합니다.
   WidgetsFlutterBinding.ensureInitialized();
 
   await _configureLocalTimeZone();
@@ -146,15 +145,18 @@ Future<void> main() async {
     )
   ];
 
-  /// Note: permissions aren't requested here just to demonstrate that can be
-  /// done later
+  /// 참고: 여기서는 나중에 수행할 수 있다는 것을 보여주기 위해 권한을 요청하지 않습니다.
   final DarwinInitializationSettings initializationSettingsDarwin =
       DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
     requestSoundPermission: false,
-    onDidReceiveLocalNotification:
-        (int id, String? title, String? body, String? payload) async {
+    onDidReceiveLocalNotification: (
+      int id,
+      String? title,
+      String? body,
+      String? payload,
+    ) async {
       didReceiveLocalNotificationStream.add(
         ReceivedNotification(
           id: id,
@@ -360,7 +362,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('플러그인 예제 앱'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -370,16 +372,14 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                    child:
-                        Text('Tap on a notification when it appears to trigger'
-                            ' navigation'),
+                    child: Text('알림이 표시되면 탭하여 Navigation을 트리거합니다.'),
                   ),
                   _InfoValueString(
-                    title: 'Did notification launch app?',
+                    title: '알림이 앱을 실행했나요?',
                     value: widget.didNotificationLaunchApp,
                   ),
                   if (widget.didNotificationLaunchApp) ...<Widget>[
-                    const Text('Launch notification details'),
+                    const Text('Launch notification 상세'),
                     _InfoValueString(
                         title: 'Notification id',
                         value: widget.notificationAppLaunchDetails!
@@ -399,163 +399,145 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                   PaddedElevatedButton(
-                    buttonText: 'Show plain notification with payload',
+                    buttonText: '페이로드가 포함된 일반 알림',
                     onPressed: () async {
                       await _showNotification();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText:
-                        'Show plain notification that has no title with '
-                        'payload',
+                    buttonText: '페이로드와 함께 제목이 없는 일반 알림 표시',
                     onPressed: () async {
                       await _showNotificationWithNoTitle();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Show plain notification that has no body with '
-                        'payload',
+                    buttonText: '페이로드가 있는 본문이 없는 일반 알림 표시',
                     onPressed: () async {
                       await _showNotificationWithNoBody();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Show notification with custom sound',
+                    buttonText: '사용자 지정 사운드와 함께 알림 표시',
                     onPressed: () async {
                       await _showNotificationCustomSound();
                     },
                   ),
                   if (kIsWeb || !Platform.isLinux) ...<Widget>[
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule notification to appear in 5 seconds '
-                          'based on local time zone',
+                      buttonText: '현지 시간대를 기준으로 5초 후에 알림이 표시되도록 예약하기',
                       onPressed: () async {
                         await _zonedScheduleNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule notification to appear in 5 seconds '
-                          'based on local time zone using alarm clock',
+                      buttonText: '알람 시계를 사용하여 현지 시간대를 기준으로 '
+                          '5초 후에 알림이 표시되도록 예약하기',
                       onPressed: () async {
                         await _zonedScheduleAlarmClockNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Repeat notification every minute',
+                      buttonText: '1분마다 알림 반복',
                       onPressed: () async {
                         await _repeatNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule daily 10:00:00 am notification in your '
-                          'local time zone',
+                      buttonText: '현지 시간대로 매일 오전 10:00:00 알림 예약하기',
                       onPressed: () async {
                         await _scheduleDailyTenAMNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule daily 10:00:00 am notification in your '
-                          "local time zone using last year's date",
+                      buttonText: '작년 날짜를 사용하여 현지 시간대의 '
+                          '매일 오전 10:00:00에 알림을 예약합니다.',
                       onPressed: () async {
                         await _scheduleDailyTenAMLastYearNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule weekly 10:00:00 am notification in your '
-                          'local time zone',
+                      buttonText: '현지 시간대로 매주 오전 10:00:00 알림 예약하기',
                       onPressed: () async {
                         await _scheduleWeeklyTenAMNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Schedule weekly Monday 10:00:00 am notification '
-                          'in your local time zone',
+                      buttonText: '현지 시간대의 매주 월요일 오전 10:00:00 알림을 예약하세요.',
                       onPressed: () async {
                         await _scheduleWeeklyMondayTenAMNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Check pending notifications',
+                      buttonText: '대기 중인 알림 확인',
                       onPressed: () async {
                         await _checkPendingNotificationRequests();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Get active notifications',
+                      buttonText: '활성화된 알림 받기',
                       onPressed: () async {
                         await _getActiveNotifications();
                       },
                     ),
                   ],
                   PaddedElevatedButton(
-                    buttonText:
-                        'Schedule monthly Monday 10:00:00 am notification in '
-                        'your local time zone',
+                    buttonText: '매월 월요일 오전 10:00:00(현지 시간 기준) 알림 예약하기',
                     onPressed: () async {
                       await _scheduleMonthlyMondayTenAMNotification();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText:
-                        'Schedule yearly Monday 10:00:00 am notification in '
-                        'your local time zone',
+                    buttonText: '현지 시간대로 매년 월요일 오전 10:00:00에 알림을 예약하세요.',
                     onPressed: () async {
                       await _scheduleYearlyMondayTenAMNotification();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Show notification with no sound',
+                    buttonText: '소리 없이 알림 표시',
                     onPressed: () async {
                       await _showNotificationWithNoSound();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Cancel latest notification',
+                    buttonText: '마지막 알림 취소',
                     onPressed: () async {
                       await _cancelNotification();
                     },
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Cancel all notifications',
+                    buttonText: '모든 알림 취소',
                     onPressed: () async {
                       await _cancelAllNotifications();
                     },
                   ),
                   const Divider(),
                   const Text(
-                    'Notifications with actions',
+                    '액션이 포함된 알림',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   PaddedElevatedButton(
-                    buttonText: 'Show notification with plain actions',
+                    buttonText: '일반 작업으로 알림 표시',
                     onPressed: () async {
                       await _showNotificationWithActions();
                     },
                   ),
                   if (Platform.isLinux)
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with icon action (if supported)',
+                      buttonText: '아이콘 액션으로 알림 표시(만일, 지원되는 경우)',
                       onPressed: () async {
                         await _showNotificationWithIconAction();
                       },
                     ),
                   if (!Platform.isLinux)
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with text action',
+                      buttonText: '텍스트 액션으로 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithTextAction();
                       },
                     ),
                   if (!Platform.isLinux)
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with text choice',
+                      buttonText: '텍스트 선택이 가능한 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithTextChoice();
                       },
@@ -563,251 +545,230 @@ class _HomePageState extends State<HomePage> {
                   const Divider(),
                   if (Platform.isAndroid) ...<Widget>[
                     const Text(
-                      'Android-specific examples',
+                      'Android 관련 예제',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text('notifications enabled: $_notificationsEnabled'),
+                    Text('알림 사용: $_notificationsEnabled'),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Check if notifications are enabled for this app',
+                      buttonText: '이 앱에 알림이 활성화되어 있는지 확인',
                       onPressed: _areNotifcationsEnabledOnAndroid,
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Request permission (API 33+)',
+                      buttonText: '권한 요청(API 33+)',
                       onPressed: () => _requestPermissions(),
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show plain notification with payload and update '
-                          'channel description',
+                      buttonText: '페이로드 및 업데이트 채널 설명이 포함된 일반 알림 표시',
                       onPressed: () async {
                         await _showNotificationUpdateChannelDescription();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show plain notification as public on every '
-                          'lockscreen',
+                      buttonText: '모든 잠금 화면에서 일반 알림을 공개로 표시하기',
                       onPressed: () async {
                         await _showPublicNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with custom vibration pattern, '
-                          'red LED and red icon',
+                      buttonText: '사용자 지정 진동 패턴, 빨간색 LED 및 빨간색 아이콘으로 알림 표시',
                       onPressed: () async {
                         await _showNotificationCustomVibrationIconLed();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification using Android Uri sound',
+                      buttonText: 'Android Uri 사운드를 사용하여 알림 표시',
                       onPressed: () async {
                         await _showSoundUriNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification that times out after 3 seconds',
+                      buttonText: '3초 후 시간 초과 알림 표시',
                       onPressed: () async {
                         await _showTimeoutNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show insistent notification',
+                      buttonText: '지속 알림 표시',
                       onPressed: () async {
                         await _showInsistentNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show big picture notification using local images',
+                      buttonText: '로컬 이미지를 사용하여 큰 사진 알림 표시',
                       onPressed: () async {
                         await _showBigPictureNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show big picture notification using base64 String '
-                          'for images',
+                      buttonText: '이미지에 base64 문자열을 사용하여 큰 사진 알림 표시',
                       onPressed: () async {
                         await _showBigPictureNotificationBase64();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show big picture notification using URLs for '
-                          'Images',
+                      buttonText: '이미지의 URL을 사용하여 큰 사진 알림 표시',
                       onPressed: () async {
                         await _showBigPictureNotificationURL();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show big picture notification, hide large icon '
-                          'on expand',
+                      buttonText: '큰 사진 알림 표시, 확장 시 큰 아이콘 숨기기',
                       onPressed: () async {
                         await _showBigPictureNotificationHiddenLargeIcon();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show media notification',
+                      buttonText: '미디어 알림 표시',
                       onPressed: () async {
                         await _showNotificationMediaStyle();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show big text notification',
+                      buttonText: '큰 텍스트 알림 표시',
                       onPressed: () async {
                         await _showBigTextNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show inbox notification',
+                      buttonText: '받은 편지함 알림 표시',
                       onPressed: () async {
                         await _showInboxNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show messaging notification',
+                      buttonText: '메시지 알림 표시',
                       onPressed: () async {
                         await _showMessagingNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show grouped notifications',
+                      buttonText: '그룹 알림 표시',
                       onPressed: () async {
                         await _showGroupedNotifications();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with tag',
+                      buttonText: '태그가 있는 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithTag();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Cancel notification with tag',
+                      buttonText: '태그를 사용하여 알림 취소',
                       onPressed: () async {
                         await _cancelNotificationWithTag();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show ongoing notification',
+                      buttonText: '진행 중인 알림 표시',
                       onPressed: () async {
                         await _showOngoingNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with no badge, alert only once',
+                      buttonText: '배지 없이 알림 표시, 한 번만 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithNoBadge();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show progress notification - updates every second',
+                      buttonText: '진행률 알림 표시 - 매초 업데이트',
                       onPressed: () async {
                         await _showProgressNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show indeterminate progress notification',
+                      buttonText: '불확실한 진행률 알림 표시',
                       onPressed: () async {
                         await _showIndeterminateProgressNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification without timestamp',
+                      buttonText: '타임스탬프 없이 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithoutTimestamp();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with custom timestamp',
+                      buttonText: '사용자 지정 타임스탬프가 포함된 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithCustomTimestamp();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with custom sub-text',
+                      buttonText: '사용자 지정 하위 텍스트가 포함된 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithCustomSubText();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with chronometer',
+                      buttonText: '크로노미터로 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithChronometer();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show full-screen notification',
+                      buttonText: '전체 화면 알림 표시',
                       onPressed: () async {
                         await _showFullScreenNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with number if the launcher '
-                          'supports',
+                      buttonText: '런처가 지원하는 경우 번호와 함께 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithNumber();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with sound controlled by '
-                          'alarm volume',
+                      buttonText: '알람 볼륨으로 제어되는 소리와 함께 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithAudioAttributeAlarm();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Create grouped notification channels',
+                      buttonText: '그룹화된 알림 채널 만들기',
                       onPressed: () async {
                         await _createNotificationChannelGroup();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Delete notification channel group',
+                      buttonText: '알림 채널 그룹 삭제',
                       onPressed: () async {
                         await _deleteNotificationChannelGroup();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Create notification channel',
+                      buttonText: '알림 채널 만들기',
                       onPressed: () async {
                         await _createNotificationChannel();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Delete notification channel',
+                      buttonText: '알림 채널 삭제',
                       onPressed: () async {
                         await _deleteNotificationChannel();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Get notification channels',
+                      buttonText: '알림 채널 받기',
                       onPressed: () async {
                         await _getNotificationChannels();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Start foreground service',
+                      buttonText: '포그라운드 서비스 시작',
                       onPressed: () async {
                         await _startForegroundService();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Start foreground service with blue background '
-                          'notification',
+                      buttonText: '파란색 배경 알림으로 포그라운드 서비스 시작',
                       onPressed: () async {
                         await _startForegroundServiceWithBlueBackgroundNotification();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Stop foreground service',
+                      buttonText: '포 그라운드 서비스 중지',
                       onPressed: () async {
                         await _stopForegroundService();
                       },
@@ -816,72 +777,65 @@ class _HomePageState extends State<HomePage> {
                   if (!kIsWeb &&
                       (Platform.isIOS || Platform.isMacOS)) ...<Widget>[
                     const Text(
-                      'iOS and macOS-specific examples',
+                      'iOS 및 macOS 관련 예제',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Request permission',
+                      buttonText: '권한 요청',
                       onPressed: _requestPermissions,
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with subtitle',
+                      buttonText: '부제목이 있는 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithSubtitle();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with icon badge',
+                      buttonText: '아이콘 배지로 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithIconBadge();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with attachment (with thumbnail)',
+                      buttonText: '첨부파일이 있는 알림 표시(썸네일 포함)',
                       onPressed: () async {
                         await _showNotificationWithAttachment(
                             hideThumbnail: false);
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with attachment (no thumbnail)',
+                      buttonText: '첨부파일이 있는 알림 표시(썸네일 없음)',
                       onPressed: () async {
                         await _showNotificationWithAttachment(
                             hideThumbnail: true);
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with attachment (clipped thumbnail)',
+                      buttonText: '첨부파일이 포함된 알림 표시(스크랩한 썸네일)',
                       onPressed: () async {
                         await _showNotificationWithClippedThumbnailAttachment();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notifications with thread identifier',
+                      buttonText: '스레드 식별자로 알림 표시',
                       onPressed: () async {
                         await _showNotificationsWithThreadIdentifier();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification with time sensitive interruption '
-                          'level',
+                      buttonText: '시간에 민감한 중단 레벨로 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithTimeSensitiveInterruptionLevel();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with banner but not in '
-                          'notification centre',
+                      buttonText: '알림 센터가 아닌 배너로 알림 표시',
                       onPressed: () async {
                         await _showNotificationWithBannerNotInNotificationCentre();
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText:
-                          'Show notification in notification centre only',
+                      buttonText: '알림 센터에서만 알림 표시',
                       onPressed: () async {
                         await _showNotificationInNotificationCentreOnly();
                       },
@@ -889,7 +843,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                   if (!kIsWeb && Platform.isLinux) ...<Widget>[
                     const Text(
-                      'Linux-specific examples',
+                      'Linux 관련 예제',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     FutureBuilder<LinuxServerCapabilities>(
@@ -906,7 +860,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  'Capabilities of the current system:',
+                                  '현재 시스템의 기능:',
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium!
@@ -966,7 +920,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     PaddedElevatedButton(
-                      buttonText: 'Show notification with body markup',
+                      buttonText: '본문 마크업으로 알림 표시',
                       onPressed: () async {
                         await _showLinuxNotificationWithBodyMarkup();
                       },
@@ -1075,24 +1029,23 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _showNotification() async {
     const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            channelDescription: 'your channel description',
+        AndroidNotificationDetails('채널 ID', '채널 이름',
+            channelDescription: '채널 설명',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker');
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin.show(
-        id++, 'plain title', 'plain body', notificationDetails,
-        payload: 'item x');
+    await flutterLocalNotificationsPlugin
+        .show(id++, '일반 제목', '일반 바디', notificationDetails, payload: 'item x');
   }
 
   Future<void> _showNotificationWithActions() async {
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      channelDescription: 'your channel description',
+      '채널 ID',
+      '채널 이름',
+      channelDescription: '채널 설명',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',
@@ -1151,9 +1104,8 @@ class _HomePageState extends State<HomePage> {
       macOS: macOSNotificationDetails,
       linux: linuxNotificationDetails,
     );
-    await flutterLocalNotificationsPlugin.show(
-        id++, 'plain title', 'plain body', notificationDetails,
-        payload: 'item z');
+    await flutterLocalNotificationsPlugin
+        .show(id++, '일반 제목', '일반 바디', notificationDetails, payload: 'item z');
   }
 
   Future<void> _showNotificationWithTextAction() async {
@@ -1190,9 +1142,13 @@ class _HomePageState extends State<HomePage> {
       macOS: darwinNotificationDetails,
     );
 
-    await flutterLocalNotificationsPlugin.show(id++, 'Text Input Notification',
-        'Expand to see input action', notificationDetails,
-        payload: 'item x');
+    await flutterLocalNotificationsPlugin.show(
+      id++,
+      '텍스트 입력 알림',
+      '입력 액션을 보려면 확장하세요.',
+      notificationDetails,
+      payload: 'item x',
+    );
   }
 
   Future<void> _showNotificationWithIconAction() async {
@@ -1273,13 +1229,13 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               await flutterLocalNotificationsPlugin.zonedSchedule(
                   0,
-                  'scheduled title',
-                  'scheduled body',
+                  '예약된 제목',
+                  '예약된 본문',
                   tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
                   const NotificationDetails(
                       android: AndroidNotificationDetails(
-                          'full screen channel id', 'full screen channel name',
-                          channelDescription: 'full screen channel description',
+                          '전체 화면 채널 ID', '전체 화면 채널 이름',
+                          channelDescription: '전체 화면 채널 설명',
                           priority: Priority.high,
                           importance: Importance.high,
                           fullScreenIntent: true)),
